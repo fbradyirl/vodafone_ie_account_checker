@@ -10,11 +10,12 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [ ]
+with open('requirements.txt') as f:
+    requirements = f.read().splitlines()
 
-setup_requirements = [ ]
+setup_requirements = []
 
-test_requirements = [ ]
+test_requirements = []
 
 setup(
     author="Finbarr Brady",
@@ -38,7 +39,10 @@ setup(
     include_package_data=True,
     keywords='vodafone_ie_account_checker',
     name='vodafone_ie_account_checker',
-    packages=find_packages(include=['vodafone_ie_account_checker', 'vodafone_ie_account_checker.*']),
+    packages=find_packages(
+        include=[
+            'vodafone_ie_account_checker',
+         'vodafone_ie_account_checker.*']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,

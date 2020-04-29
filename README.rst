@@ -26,12 +26,4 @@ Python package to check broadband usage data from vodafone.ie
 Features
 --------
 
-* TODO
-
-Credits
--------
-
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
-
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
+* 1 function - to check the broadband usage for Vodafone Ireland account holders. e.g. 412GB used this month.
