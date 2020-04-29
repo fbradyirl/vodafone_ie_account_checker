@@ -4,6 +4,7 @@ import logging
 import requests
 
 from lxml import html
+from collections import namedtuple
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -39,7 +40,7 @@ class Account:
         self.get_account_overview_request()
 
     def get_account_overview_request(self):
-        """ Do the account overview request. """
+        """ Do the account overview request and return account tuple """
 
         headers = {
             'Connection': 'keep-alive',
@@ -69,8 +70,8 @@ class Account:
             ('t', '1'),
         )
 
-        log.error(f"self.verification_token1 {self.verification_token1}")
-        log.error(f"self.verification_token2 {self.verification_token2}")
+        # log.debug(f"self.verification_token1 {self.verification_token1}")
+        # log.debug(f"self.verification_token2 {self.verification_token2}")
 
         cookies = {
             '__RequestVerificationToken': self.verification_token1,
@@ -89,9 +90,6 @@ class Account:
                                       data=data
                                       )
 
-        log.warning(
-            f"session/login (2) request completed with"
-            f" status: {response.status_code}")
         self.log_session_info()
         tree = html.fromstring(response.content)
 
@@ -101,7 +99,7 @@ class Account:
             '//*[@id="main"]/div/section/div[2]/section[1]/div/h2/text()')
 
         # data usage. e.g. ['397.35 GB']
-        broadband_usage = tree.xpath(
+        usage_value = tree.xpath(
             '//*[@id="main"]/div/section/div[2]/section[1]/div/div/div/'
             'strong/text()')
 
@@ -109,8 +107,16 @@ class Account:
             log.warning("Unable to get usage data.")
             log.warning(response.content)
         else:
-            log.debug(f"usage_since: {usage_since} : {broadband_usage}")
+            AccountDetails = namedtuple("AccountDetails",
+                                        ["usage_since", "usage_value"])
+            accountDetails = AccountDetails(usage_since, usage_value)
+            log.debug(accountDetails)
+            return accountDetails
+
+        return None
 
     def log_session_info(self):
-        log.warning("Session Cookies: " +
-                    str(self._session.cookies.get_dict()))
+        """ Log session cookies etc. """
+
+        # log.debug("Session Cookies: " +
+        #             str(self._session.cookies.get_dict()))
