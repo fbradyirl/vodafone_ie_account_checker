@@ -29,6 +29,7 @@ class Account:
         if "@" not in username:
             log.warning("Vodafone Broadband username "
                         "should be an email address.")
+        self.logged_in = False
 
         self._session = requests.Session()
         self.username = username
@@ -111,9 +112,14 @@ class Account:
                                         ["usage_since", "usage_value"])
             accountDetails = AccountDetails(usage_since, usage_value)
             log.debug(accountDetails)
+            self.logged_in = True
             return accountDetails
 
         return None
+
+    def is_logged_in(self):
+        """Returns true if a successful login has happened"""
+        return self.logged_in
 
     def log_session_info(self):
         """ Log session cookies etc. """
