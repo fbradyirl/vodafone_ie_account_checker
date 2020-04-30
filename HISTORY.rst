@@ -16,3 +16,9 @@ History
 ------------------
 
 * Switch to returning single items in results.
+
+
+0.1.4 (2020-04-30)
+------------------
+
+* Update data object on fetch success.

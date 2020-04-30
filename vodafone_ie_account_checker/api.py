@@ -30,6 +30,7 @@ class Account:
             log.warning("Vodafone Broadband username "
                         "should be an email address.")
         self.logged_in = False
+        self.data = None
 
         self._session = requests.Session()
         self.username = username
@@ -106,13 +107,14 @@ class Account:
 
         if len(usage_since) == 0 or len(usage_value) == 0:
             log.warning("Unable to get usage data.")
-            log.warning(response.content)
+            # log.warning(response.content)
         else:
             AccountDetails = namedtuple("AccountDetails",
                                         ["usage_since", "usage_value"])
             accountDetails = AccountDetails(usage_since[0], usage_value[0])
             log.debug(accountDetails)
             self.logged_in = True
+            self.data = accountDetails
             return accountDetails
 
         return None
