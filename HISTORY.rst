@@ -27,3 +27,8 @@ History
 
 * Adding last update time.
 * Adding bundle name and account balance.
+
+0.1.7 (2020-04-30)
+------------------
+
+* Bump version
