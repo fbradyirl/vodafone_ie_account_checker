@@ -104,13 +104,13 @@ class Account:
             '//*[@id="main"]/div/section/div[2]/section[1]/div/div/div/'
             'strong/text()')
 
-        if len(usage_since) == 0:
+        if len(usage_since) == 0 or len(usage_value) == 0:
             log.warning("Unable to get usage data.")
             log.warning(response.content)
         else:
             AccountDetails = namedtuple("AccountDetails",
                                         ["usage_since", "usage_value"])
-            accountDetails = AccountDetails(usage_since, usage_value)
+            accountDetails = AccountDetails(usage_since[0], usage_value[0])
             log.debug(accountDetails)
             self.logged_in = True
             return accountDetails
