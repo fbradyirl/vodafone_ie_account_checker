@@ -5,9 +5,15 @@ import requests
 
 from lxml import html
 from collections import namedtuple
+from datetime import datetime
 
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
+
+XP_USAGE_SINCE = '//*[@id="main"]/div/section/div[2]/section[1]/div/h2/text()'
+XP_USAGE_TOTAL = '//*[@id="main"]/div/section/div[2]/section[1]/div/div/div/strong/text()'
+XP_ACCOUNT_BALANCE = '//*[@id="main"]/div/section/div[1]/section[1]/div/span/text()'
+XP_BUNDLE_NAME = '//*[@id="main"]/div/section/div[2]/section[2]/div/div[1]/div[1]/ul[1]/li/text()'
 
 
 class Account:
@@ -93,31 +99,53 @@ class Account:
                                       )
 
         self.log_session_info()
-        tree = html.fromstring(response.content)
 
         # usage since date
         # e.g. ['Since 15 Apr 2020']
-        usage_since = tree.xpath(
-            '//*[@id="main"]/div/section/div[2]/section[1]/div/h2/text()')
-
+        usage_since = self.get_xpath_value(response, XP_USAGE_SINCE)
         # data usage. e.g. ['397.35 GB']
-        usage_value = tree.xpath(
-            '//*[@id="main"]/div/section/div[2]/section[1]/div/div/div/'
-            'strong/text()')
+        usage_value = self.get_xpath_value(response, XP_USAGE_TOTAL)
+        # account due fee. e.g. €60
+        account_balance = self.get_xpath_value(response, XP_ACCOUNT_BALANCE)
+        # Bundles
+        # Gigabit Broadband 300 (eir)
+        bundle_name = self.get_xpath_value(response, XP_BUNDLE_NAME)
 
-        if len(usage_since) == 0 or len(usage_value) == 0:
+        if usage_value == "":
             log.warning("Unable to get usage data.")
             # log.warning(response.content)
         else:
             AccountDetails = namedtuple("AccountDetails",
-                                        ["usage_since", "usage_value"])
-            accountDetails = AccountDetails(usage_since[0], usage_value[0])
-            log.debug(accountDetails)
+                                        ["usage_since",
+                                         "usage_value",
+                                         "last_updated",
+                                         "account_balance",
+                                         "bundle_name"])
+            account_details = AccountDetails(usage_since,
+                                             usage_value,
+                                             datetime.now(),
+                                             account_balance,
+                                             bundle_name)
+            log.debug(account_details)
             self.logged_in = True
-            self.data = accountDetails
-            return accountDetails
+            self.data = account_details
+            return account_details
 
         return None
+
+    def get_xpath_value(self, response, path):
+        """ Returns first result of xpath match, or blank string if not found. """
+        tree = html.fromstring(response.content)
+        try:
+            result = tree.xpath(path)
+            if len(result) == 0:
+                log.warning(f"xpath not found: {path}")
+                return ""
+            return result[0]
+        except:
+            log.warning(f"xpath not found: {path}")
+
+        return ""
 
     def is_logged_in(self):
         """Returns true if a successful login has happened"""
