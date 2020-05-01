@@ -59,8 +59,6 @@ class Account:
         self.verification_token2 = token2
         self.fair_usage_limit = fair_usage_limit
 
-        self.get_account_overview_request()
-
     def get_account_overview_request(self):
         """ Do the account overview request and return account tuple """
 

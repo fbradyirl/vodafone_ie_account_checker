@@ -48,3 +48,9 @@ History
 ------------------
 
 * Return percent used as attribute.
+
+
+0.3.3 (2020-05-01)
+------------------
+
+* Dont fetch on init
