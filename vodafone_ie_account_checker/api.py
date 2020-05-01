@@ -10,10 +10,14 @@ from datetime import datetime
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-XP_USAGE_SINCE = '//*[@id="main"]/div/section/div[2]/section[1]/div/h2/text()'
-XP_USAGE_TOTAL = '//*[@id="main"]/div/section/div[2]/section[1]/div/div/div/strong/text()'
-XP_ACCOUNT_BALANCE = '//*[@id="main"]/div/section/div[1]/section[1]/div/span/text()'
-XP_BUNDLE_NAME = '//*[@id="main"]/div/section/div[2]/section[2]/div/div[1]/div[1]/ul[1]/li/text()'
+XP_USAGE_SINCE = '//*[@id="main"]/div/section/' \
+                 'div[2]/section[1]/div/h2/text()'
+XP_USAGE_TOTAL = '//*[@id="main"]/div/section/' \
+                 'div[2]/section[1]/div/div/div/strong/text()'
+XP_ACCOUNT_BALANCE = '//*[@id="main"]/div/section/' \
+                     'div[1]/section[1]/div/span/text()'
+XP_BUNDLE_NAME = '//*[@id="main"]/div/section/' \
+                 'div[2]/section[2]/div/div[1]/div[1]/ul[1]/li/text()'
 
 
 class Account:
@@ -134,7 +138,8 @@ class Account:
         return None
 
     def get_xpath_value(self, response, path):
-        """ Returns first result of xpath match, or blank string if not found. """
+        """ Returns first result of xpath
+        match, or blank string if not found. """
         tree = html.fromstring(response.content)
         try:
             result = tree.xpath(path)
@@ -142,7 +147,7 @@ class Account:
                 log.warning(f"xpath not found: {path}")
                 return ""
             return result[0]
-        except:
+        except ValueError:
             log.warning(f"xpath not found: {path}")
 
         return ""
