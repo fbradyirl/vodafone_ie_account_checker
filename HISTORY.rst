@@ -38,3 +38,7 @@ History
 
 * Remove Python 3.5 support.
 
+0.2.1 (2020-05-01)
+------------------
+
+* Remove Python 3.6 support.
