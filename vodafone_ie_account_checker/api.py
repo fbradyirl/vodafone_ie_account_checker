@@ -128,7 +128,6 @@ class Account:
         if usage_value == "":
             log.warning("Unable to get usage data.")
             # log.warning(response.content)
-            self.data = None
         else:
             AccountDetails = namedtuple("AccountDetails",
                                         ["usage_since",
