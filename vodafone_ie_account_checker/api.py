@@ -125,7 +125,7 @@ class Account:
         # Gigabit Broadband 300 (eir)
         bundle_name = self.get_xpath_value(response, XP_BUNDLE_NAME)
 
-        if usage_value == "":
+        if usage_value_raw == "":
             log.warning("Unable to get usage data.")
             # log.warning(response.content)
         else:
