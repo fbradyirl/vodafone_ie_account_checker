@@ -33,7 +33,7 @@ History
 
 * Bump version
 
-0.1.9 (2020-05-01)
+0.2.0 (2020-05-01)
 ------------------
 
 * Remove Python 3.5 support.
