@@ -54,3 +54,8 @@ History
 ------------------
 
 * Dont fetch on init
+
+0.3.4 (2020-05-01)
+------------------
+
+* Set data to None if failed.
