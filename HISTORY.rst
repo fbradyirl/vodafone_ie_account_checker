@@ -42,3 +42,9 @@ History
 ------------------
 
 * Remove Python 3.6 support.
+
+
+0.3.2 (2020-05-01)
+------------------
+
+* Return percent used as attribute.

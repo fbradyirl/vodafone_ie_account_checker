@@ -19,13 +19,20 @@ XP_ACCOUNT_BALANCE = '//*[@id="main"]/div/section/' \
 XP_BUNDLE_NAME = '//*[@id="main"]/div/section/' \
                  'div[2]/section[2]/div/div[1]/div[1]/ul[1]/li/text()'
 
+DEFAULT_FAIR_USAGE_LIMIT_GB = 1000
+DATA_KILOBYTES = "kB"
+DATA_MEGABYTES = "MB"
+DATA_GIGABYTES = "GB"
+DATA_TERABYTES = "TB"
+
 
 class Account:
     """
     Represents a VF Account.
     """
 
-    def __init__(self, username, password, token1, token2):
+    def __init__(self, username, password, token1, token2,
+                 fair_usage_limit=DEFAULT_FAIR_USAGE_LIMIT_GB):
         """
         Defines an vf account.
 
@@ -33,6 +40,8 @@ class Account:
         :param password: VF Broadband password
         :param token1: Token 1
         :param token2: Token 2
+        :param fair_usage_limit: If your fair usage is
+        not 1000 GB, specify it here.
         """
         log.debug("Initialising new VF Account")
 
@@ -48,6 +57,7 @@ class Account:
 
         self.verification_token1 = token1
         self.verification_token2 = token2
+        self.fair_usage_limit = fair_usage_limit
 
         self.get_account_overview_request()
 
@@ -102,13 +112,14 @@ class Account:
                                       data=data
                                       )
 
-        self.log_session_info()
-
         # usage since date
         # e.g. ['Since 15 Apr 2020']
         usage_since = self.get_xpath_value(response, XP_USAGE_SINCE)
         # data usage. e.g. ['397.35 GB']
-        usage_value = self.get_xpath_value(response, XP_USAGE_TOTAL)
+        usage_value_raw = self.get_xpath_value(response, XP_USAGE_TOTAL)
+        usage_value, usage_value_unit, usage_percent = \
+            self.get_usage_values(usage_value_raw)
+
         # account due fee. e.g. €60
         account_balance = self.get_xpath_value(response, XP_ACCOUNT_BALANCE)
         # Bundles
@@ -122,11 +133,17 @@ class Account:
             AccountDetails = namedtuple("AccountDetails",
                                         ["usage_since",
                                          "usage_value",
+                                         "usage_value_raw",
+                                         "usage_value_unit",
+                                         "usage_percent",
                                          "last_updated",
                                          "account_balance",
                                          "bundle_name"])
             account_details = AccountDetails(usage_since,
                                              usage_value,
+                                             usage_value_raw,
+                                             usage_value_unit,
+                                             usage_percent,
                                              datetime.now(),
                                              account_balance,
                                              bundle_name)
@@ -156,8 +173,27 @@ class Account:
         """Returns true if a successful login has happened"""
         return self.logged_in
 
-    def log_session_info(self):
-        """ Log session cookies etc. """
+    def get_usage_values(self, usage_value_raw):
+        """ Get usage values. """
+        try:
+            usage_value = usage_value_raw.split(' ')[0]
+            usage_value_unit = self.get_unit(usage_value_raw.split(' ')[1])
+            usage_percent = int((float(usage_value) /
+                                 self.fair_usage_limit) * 100)
 
-        # log.debug("Session Cookies: " +
-        #             str(self._session.cookies.get_dict()))
+            return usage_value, usage_value_unit, usage_percent
+        except Exception:
+            log.error("Unable to calculate usage.")
+
+        return None, None, None
+
+    def get_unit(self, unit_string):
+        value = unit_string.upper()
+        if value == "KB":
+            return DATA_KILOBYTES
+        if value == "MB":
+            return DATA_MEGABYTES
+        if value == "GB":
+            return DATA_GIGABYTES
+        if value == "TB":
+            return DATA_TERABYTES
