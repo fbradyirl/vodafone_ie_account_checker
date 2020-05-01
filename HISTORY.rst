@@ -59,3 +59,8 @@ History
 ------------------
 
 * Set data to None if failed.
+
+0.3.5 (2020-05-01)
+------------------
+
+* Extra logging

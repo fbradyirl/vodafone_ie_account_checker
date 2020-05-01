@@ -90,8 +90,9 @@ class Account:
             ('t', '1'),
         )
 
-        # log.debug(f"self.verification_token1 {self.verification_token1}")
-        # log.debug(f"self.verification_token2 {self.verification_token2}")
+        log.debug(f"self.username {self.username}")
+        log.debug(f"self.verification_token1 {self.verification_token1}")
+        log.debug(f"self.verification_token2 {self.verification_token2}")
 
         cookies = {
             '__RequestVerificationToken': self.verification_token1,
