@@ -74,3 +74,7 @@ History
 ------------------
 
 * Fix check
+
+1.0.0 (2020-05-07)
+------------------
+* Adding get_account_usage_request function
