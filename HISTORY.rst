@@ -78,3 +78,7 @@ History
 1.0.0 (2020-05-07)
 ------------------
 * Adding get_account_usage_request function
+
+1.0.1 (2020-05-08)
+------------------
+* Fix package
