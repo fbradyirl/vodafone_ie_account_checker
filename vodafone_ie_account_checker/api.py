@@ -79,6 +79,7 @@ class Account:
             log.warning("Vodafone Broadband username "
                         "should be an email address.")
         self.logged_in = False
+        self.overview_data = None
         self.data = None
 
         self._session = requests.Session()
@@ -92,6 +93,7 @@ class Account:
         self.init_login()
 
     def init_login(self):
+        """ Do the account overview request and return account tuple """
         self._session.get('https://n.vodafone'
                           '.ie/en.html')
 
@@ -100,9 +102,6 @@ class Account:
         self._session.post('https://n.vodafone.ie/'
                            'bin/mvc.do/credential/check/mml',
                            data=data)
-
-    def get_account_overview_request(self):
-        """ Do the account overview request and return account tuple """
 
         params = (
             ('t', '1'),
@@ -163,7 +162,7 @@ class Account:
                                              bundle_name)
             log.debug(account_details)
             self.logged_in = True
-            self.data = account_details
+            self.overview_data = account_details
             return account_details
 
         return None
