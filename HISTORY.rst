@@ -89,3 +89,8 @@ History
 ------------------
 
 * Login during init
+
+1.0.3 (2020-05-13)
+------------------
+
+* Add updated time
