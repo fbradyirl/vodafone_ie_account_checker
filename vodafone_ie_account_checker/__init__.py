@@ -2,7 +2,7 @@
 
 __author__ = """Finbarr Brady"""
 __email__ = 'finbarr.brady@gmail.com'
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 
 import coloredlogs
