@@ -99,3 +99,8 @@ History
 ------------------
 
 * Add total used in MB
+
+1.0.5 (2020-05-15)
+------------------
+
+* Reset session each time

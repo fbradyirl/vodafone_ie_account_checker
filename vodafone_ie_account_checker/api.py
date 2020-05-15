@@ -82,7 +82,6 @@ class Account:
         self.overview_data = None
         self.data = None
 
-        self._session = requests.Session()
         self.username = username
         self.password = password
 
@@ -90,10 +89,9 @@ class Account:
         self.verification_token2 = token2
         self.fair_usage_limit = fair_usage_limit
 
-        self.init_login()
-
     def init_login(self):
         """ Do the account overview request and return account tuple """
+        self._session = requests.Session()
         self._session.get('https://n.vodafone'
                           '.ie/en.html')
 
@@ -171,12 +169,12 @@ class Account:
     def get_account_usage_request(self):
         """ Do the account usage request and return account tuple """
 
-        #self.init_login()
-        response = requests.get('https://broadband.vodafone.'
-                                'ie/myaccount/usage',
-                                headers=self.get_headers(),
-                                cookies=self.get_cookies()
-                                )
+        self.init_login()
+        response = self._session.get('https://broadband.vodafone.'
+                                     'ie/myaccount/usage',
+                                     headers=self.get_headers(),
+                                     cookies=self.get_cookies()
+                                     )
 
         log.info("'Your Broadband Usage' in result? {}".format(
             "Your Broadband Usage" in response.text))
@@ -326,9 +324,9 @@ class Account:
             if usage_value_unit == DATA_MEGABYTES:
                 usage_value_mb = usage_value
             elif usage_value_unit == DATA_GIGABYTES:
-                usage_value_mb = float(usage_value)*1024
+                usage_value_mb = float(usage_value) * 1024
             elif usage_value_unit == DATA_TERABYTES:
-                usage_value_mb = float(usage_value)*1024*1024
+                usage_value_mb = float(usage_value) * 1024 * 1024
             else:
                 log.warning(f"Unable to determine usage_value_mb. usage_value_unit: {usage_value_unit}")
                 usage_value_mb = None
