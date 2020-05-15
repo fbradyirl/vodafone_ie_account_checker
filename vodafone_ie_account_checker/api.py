@@ -47,7 +47,7 @@ XP_USAGE_STARTED_TIME_TODAY = '{}td[1]/text()'.format(XP_LOGINS_TABLE_BASE)
 # Bill period dropdown
 XP_USAGE_PERIOD_CURRENT = '//*[@id="billing-period"]/option[1]/text()'
 
-DEFAULT_FAIR_USAGE_LIMIT_GB = 1000
+DEFAULT_FAIR_USAGE_LIMIT_GB = 1024
 DATA_KILOBYTES = "kB"
 DATA_MEGABYTES = "MB"
 DATA_GIGABYTES = "GB"
@@ -130,7 +130,7 @@ class Account:
         usage_since = self.get_xpath_value(response, XP_USAGE_SINCE)
         # data usage. e.g. ['397.35 GB']
         usage_value_raw = self.get_xpath_value(response, XP_USAGE_TOTAL)
-        usage_value, usage_value_unit, usage_percent = \
+        usage_value, usage_value_unit, usage_percent, usage_value_mb = \
             self.get_usage_values(usage_value_raw)
 
         # account due fee. e.g. €60
@@ -171,6 +171,7 @@ class Account:
     def get_account_usage_request(self):
         """ Do the account usage request and return account tuple """
 
+        #self.init_login()
         response = requests.get('https://broadband.vodafone.'
                                 'ie/myaccount/usage',
                                 headers=self.get_headers(),
@@ -186,12 +187,12 @@ class Account:
             log.info("✅ Looking good. 'Your Broadband Usage' in result.")
             bill_period = self.get_xpath_value(
                 response, XP_USAGE_PERIOD_CURRENT)
-            total_used_value, total_used_unit, total_used_percent = self.get_usage_values(
+            total_used_value, total_used_unit, total_used_percent, total_used_value_mb = self.get_usage_values(
                 self.get_xpath_value(response, XP_USAGE_TOTAL_DATA_USED))
-            total_uploaded_value, total_uploaded_used_unit, total_uploaded_used_percent = \
+            total_uploaded_value, total_uploaded_used_unit, total_uploaded_used_percent, total_uploaded_value_mb = \
                 self.get_usage_values(
                     self.get_xpath_value(response, XP_USAGE_DATA_UPLOADED))
-            total_downloaded_value, total_downloaded_used_unit, total_downloaded_used_percent = \
+            total_downloaded_value, total_downloaded_used_unit, total_downloaded_used_percent, total_downloaded_value_mb = \
                 self.get_usage_values(
                     self.get_xpath_value(response, XP_USAGE_DATA_DOWNLOADED))
             total_time_spent_online = self.get_xpath_value(
@@ -199,10 +200,10 @@ class Account:
             total_updated_time = self.get_xpath_value(
                 response, XP_USAGE_UPDATED)
 
-            today_downloaded_value, today_downloaded_used_unit, today_downloaded_used_percent = \
+            today_downloaded_value, today_downloaded_used_unit, today_downloaded_used_percent, today_downloaded_value_mb = \
                 self.get_usage_values(
                     self.get_xpath_value(response, XP_USAGE_DATA_DOWNLOADED_TODAY_SO_FAR))
-            today_uploaded_value, today_uploaded_used_unit, today_uploaded_used_percent = \
+            today_uploaded_value, today_uploaded_used_unit, today_uploaded_used_percent, today_uploaded_value_mb = \
                 self.get_usage_values(
                     self.get_xpath_value(response, XP_USAGE_DATA_UPLOADED_TODAY_SO_FAR))
             today_ip_address = self.get_xpath_value(
@@ -214,17 +215,22 @@ class Account:
                                              ["bill_period",
                                               "total_time_spent_online",
                                               "total_used_value",
+                                              "total_used_value_mb",
                                               "total_used_unit",
                                               "total_used_percent",
                                               "last_updated",
                                               "total_uploaded_value",
+                                              "total_uploaded_value_mb",
                                               "total_uploaded_used_unit",
                                               "total_downloaded_value",
+                                              "total_downloaded_value_mb",
                                               "total_downloaded_used_unit",
                                               "total_updated_time",
                                               "today_downloaded_value",
+                                              "today_downloaded_value_mb",
                                               "today_downloaded_used_unit",
                                               "today_uploaded_value",
+                                              "today_uploaded_value_mb",
                                               "today_uploaded_used_unit",
                                               "today_ip_address",
                                               "today_online_time"
@@ -232,17 +238,22 @@ class Account:
             account_usage_details = AccountUsageDetails(bill_period,
                                                         total_time_spent_online,
                                                         total_used_value,
+                                                        total_used_value_mb,
                                                         total_used_unit,
                                                         total_used_percent,
                                                         datetime.now(),
                                                         total_uploaded_value,
+                                                        total_uploaded_value_mb,
                                                         total_uploaded_used_unit,
                                                         total_downloaded_value,
+                                                        total_downloaded_value_mb,
                                                         total_downloaded_used_unit,
                                                         total_updated_time,
                                                         today_downloaded_value,
+                                                        today_downloaded_value_mb,
                                                         today_downloaded_used_unit,
                                                         today_uploaded_value,
+                                                        today_uploaded_value_mb,
                                                         today_uploaded_used_unit,
                                                         today_ip_address,
                                                         today_online_time)
@@ -312,12 +323,22 @@ class Account:
             usage_percent = int((float(usage_value) /
                                  self.fair_usage_limit) * 100)
 
-            return usage_value, usage_value_unit, usage_percent
+            if usage_value_unit == DATA_MEGABYTES:
+                usage_value_mb = usage_value
+            elif usage_value_unit == DATA_GIGABYTES:
+                usage_value_mb = float(usage_value)*1024
+            elif usage_value_unit == DATA_TERABYTES:
+                usage_value_mb = float(usage_value)*1024*1024
+            else:
+                log.warning(f"Unable to determine usage_value_mb. usage_value_unit: {usage_value_unit}")
+                usage_value_mb = None
+
+            return usage_value, usage_value_unit, usage_percent, usage_value_mb
         except Exception:
             log.error(
                 "Unable to calculate usage. usage_value_raw: {}".format(usage_value_raw))
 
-        return None, None, None
+        return None, None, None, None
 
     def get_unit(self, unit_string):
         value = unit_string.upper()

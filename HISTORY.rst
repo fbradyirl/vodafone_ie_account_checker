@@ -94,3 +94,8 @@ History
 ------------------
 
 * Add updated time
+
+1.0.4 (2020-05-14)
+------------------
+
+* Add total used in MB
