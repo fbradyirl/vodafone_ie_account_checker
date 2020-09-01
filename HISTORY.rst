@@ -104,3 +104,7 @@ History
 ------------------
 
 * Reset session each time
+
+1.0.6 (2020-09-01)
+------------------
+* Unpin deps.
