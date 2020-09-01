@@ -45,6 +45,6 @@ setup(
     test_suite='tests',
     tests_require=test_requirements,
     url='https://github.com/fbradyirl/vodafone_ie_account_checker',
-    version='1.0.5',
+    version='1.0.6',
     zip_safe=False,
 )
